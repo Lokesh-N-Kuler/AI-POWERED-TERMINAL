@@ -1,7 +1,7 @@
 import subprocess
 import os
 import platform
-
+from database.history import save_command
 
 class TerminalSession:
     def __init__(self):
@@ -85,8 +85,19 @@ class TerminalSession:
             if result.returncode == 0:
 
                 self._update_directory(command, shell_type)
+            
+            result = subprocess.run(
+    args,
+    cwd=self.cwd,
+    capture_output=True,
+    text=True,
+    timeout=30,
+)
 
-            return {
+            if result.returncode == 0:
+                self._update_directory(command, shell_type)
+
+                response = {
                 "command": command,
                 "stdout": result.stdout,
                 "stderr": result.stderr,
@@ -95,17 +106,16 @@ class TerminalSession:
                 "shell": shell_type,
             }
 
-        except subprocess.TimeoutExpired:
+            save_command(
+                command=command,
+                shell=shell_type,
+                cwd=self.cwd,
+                stdout=result.stdout,
+                stderr=result.stderr,
+                exit_code=result.returncode,
+            )
 
-            return {
-                "command": command,
-                "stdout": "",
-                "stderr": "Command execution timed out after 30 seconds.",
-                "exit_code": 124,
-                "cwd": self.cwd,
-                "shell": shell_type,
-            }
-
+            return response
         except Exception as e:
 
             return {
