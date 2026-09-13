@@ -14,9 +14,10 @@ function App() {
       <main className="app-main">
 
         <Terminal />
-
+        
+        <div className="button">
         <CommandHistory />
-
+        </div>
       </main>
 
     </div>
