@@ -18,6 +18,7 @@ function App() {
         <div className="button">
         <CommandHistory />
         </div>
+        
       </main>
 
     </div>
